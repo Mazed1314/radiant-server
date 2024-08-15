@@ -33,6 +33,7 @@ async function run() {
     // ----------------------------------------------------------------
 
     const userCollection = client.db("radiantDB").collection("allUser");
+    const productCollection = client.db("radiantDB").collection("allProduct");
 
     // ----------------------------------------------------------------
     // --------------------user related route---------------------------
@@ -67,6 +68,16 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const updateDoc = { $set: updateUser };
       const result = await userCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
+    // ----------------------------------------------------------------
+    // --------------------product related route---------------------------
+    // ----------------------------------------------------------------
+
+    app.post("/addProduct", async (req, res) => {
+      const addNewProduct = req.body;
+      const result = await productCollection.insertOne(addNewProduct);
       res.send(result);
     });
   } finally {
