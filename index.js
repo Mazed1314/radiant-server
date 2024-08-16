@@ -80,6 +80,10 @@ async function run() {
       const result = await productCollection.insertOne(addNewProduct);
       res.send(result);
     });
+    app.get("/products", async (req, res) => {
+      const result = await productCollection.find().toArray();
+      res.send(result);
+    });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
