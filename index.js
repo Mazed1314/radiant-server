@@ -80,8 +80,19 @@ async function run() {
       const result = await productCollection.insertOne(addNewProduct);
       res.send(result);
     });
+    app.get("/productsCount", async (req, res) => {
+      const count = await productCollection.estimatedDocumentCount();
+      res.send({ count });
+    });
+
     app.get("/products", async (req, res) => {
-      const result = await productCollection.find().toArray();
+      const page = parseInt(req.query.page) - 1;
+      const size = parseInt(req.query.size);
+      const result = await productCollection
+        .find()
+        .skip(page * size)
+        .limit(size)
+        .toArray();
       res.send(result);
     });
   } finally {
