@@ -172,6 +172,13 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/rating/:p_id", async (req, res) => {
+      const result = await ratingCollection
+        .find({ p_id: req.params.product_id })
+        .toArray();
+      res.send(result);
+    });
+
     app.post("/rating", async (req, res) => {
       const addNewRating = req.body;
       const result = await ratingCollection.insertOne(addNewRating);
