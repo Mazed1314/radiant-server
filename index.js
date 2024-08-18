@@ -133,6 +133,36 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/product/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedProduct = req.body;
+
+      const product = {
+        $set: {
+          name: updatedProduct.name,
+          category: updatedProduct.category,
+          description: updatedProduct.description,
+          image: updatedProduct.image,
+          brand: updatedProduct.brand,
+          price: updatedProduct.price,
+        },
+      };
+      const result = await productCollection.updateOne(
+        filter,
+        product,
+        options
+      );
+      res.send(result);
+    });
+
+    app.get("/product/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productCollection.findOne(query);
+      res.send(result);
+    });
     // ----------------------------------------------------------------
     // --------------------rating related route---------------------------
     // ----------------------------------------------------------------
