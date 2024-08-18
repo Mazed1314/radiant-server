@@ -119,6 +119,13 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/my-product/:email", async (req, res) => {
+      const result = await productCollection
+        .find({ email: req.params.email })
+        .toArray();
+      res.send(result);
+    });
+
     // ----------------------------------------------------------------
     // --------------------rating related route---------------------------
     // ----------------------------------------------------------------
