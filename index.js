@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 // middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", "https://radiant-da151.web.app"],
     credentials: true,
   })
 );
@@ -34,6 +34,7 @@ async function run() {
 
     const userCollection = client.db("radiantDB").collection("allUser");
     const productCollection = client.db("radiantDB").collection("allProduct");
+    const ratingCollection = client.db("radiantDB").collection("allRating");
 
     // ----------------------------------------------------------------
     // --------------------user related route---------------------------
@@ -88,11 +89,48 @@ async function run() {
     app.get("/products", async (req, res) => {
       const page = parseInt(req.query.page) - 1;
       const size = parseInt(req.query.size);
+      const filter = req.query.filter || "";
+      const search = req.query.search || "";
+      const sort = req.query.sort || "";
+
+      let query = {};
+      if (filter) {
+        query.category = filter;
+      }
+      if (search) {
+        query.name = { $regex: search, $options: "i" };
+      }
+
+      let sortOrder = {};
+      if (sort === "low") {
+        sortOrder.price = 1;
+      } else if (sort === "high") {
+        sortOrder.price = -1;
+      } else if (sort === "newest") {
+        sortOrder.createdAt = -1;
+      }
+
       const result = await productCollection
-        .find()
+        .find(query)
+        .sort(sortOrder)
         .skip(page * size)
         .limit(size)
         .toArray();
+      res.send(result);
+    });
+
+    // ----------------------------------------------------------------
+    // --------------------rating related route---------------------------
+    // ----------------------------------------------------------------
+
+    app.get("/rating", async (req, res) => {
+      const result = await ratingCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.post("/rating", async (req, res) => {
+      const addNewRating = req.body;
+      const result = await ratingCollection.insertOne(addNewRating);
       res.send(result);
     });
   } finally {
